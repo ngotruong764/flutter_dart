@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:quizz_app/data/question.dart';
 import 'package:quizz_app/question_screen.dart';
+import 'package:quizz_app/result_screen.dart';
 import 'package:quizz_app/start_screen.dart';
 
 class Quiz extends StatefulWidget {
@@ -10,22 +12,49 @@ class Quiz extends StatefulWidget {
 }
 
 class _QuizState extends State<Quiz> {
-  Widget? activeScreen;
+  List<String> selectedAnswers = [];
+  // Widget? activeScreen;
+  var activeScreen = 'start-screen';
 
-  @override
-  void initState() {
-    super.initState();
-    activeScreen = StartScreen(switchScreen);
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   activeScreen = StartScreen(switchScreen);
+  // }
+
+  void switchScreen(String screen) {
+    setState(() {
+      // activeScreen = const QuestionScreen();
+      // if (screen == 'result-screen') {
+      //   activeScreen = 'result-screen';
+      // } else {
+      //   activeScreen = 'question-screen';
+      // }
+      activeScreen = 'question-screen';
+      if (screen == 'result-screen') {
+        activeScreen = 'start-screen';
+      }
+    });
   }
 
-  void switchScreen() {
-    setState(() {
-      activeScreen = const QuestionScreen();
-    });
+  void chooseAnwer(String answer) {
+    selectedAnswers.add(answer);
+    if (selectedAnswers.length == questions.length) {
+      setState(() {
+        activeScreen = 'result-screen';
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    Widget screenWidget = StartScreen(switchScreen);
+
+    if (activeScreen == 'question-screen') {
+      screenWidget = QuestionScreen(chooseAnwer);
+    } else if (activeScreen == 'result-screen') {
+      screenWidget = ResultScreen(switchScreen, selectedAnswers);
+    }
     return MaterialApp(
       home: Scaffold(
         body: Container(
@@ -39,7 +68,7 @@ class _QuizState extends State<Quiz> {
               end: Alignment.bottomRight,
             ),
           ),
-          child: activeScreen,
+          child: screenWidget,
         ),
       ),
     );
